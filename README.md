@@ -40,3 +40,10 @@ This exists for the case where you have a stream of timestamps and you only care
 Buckets are half-open intervals `[start, end)`. A timestamp landing exactly on a boundary belongs to the bucket whose `start` equals that timestamp, not the previous one. If you are feeding in values produced by a separate timer, align your `width` and `floor` to that timer's tick grid or you will see surprising bucket assignments.
 
 Non-finite timestamps (`nan`, `inf`, `-inf`) are rejected by `add()` with `ValueError` rather than silently producing a corrupt index. The `floor` parameter shifts the bucket grid so that `floor` itself is a bucket boundary; the default `floor=0` uses the Unix epoch as the origin.
+
+## Performance
+
+The window keeps a bounded buffer, so `push` is constant time and memory does not
+grow with the length of the stream. `peak` and `trough` are linear in the window
+size, which is the trade that keeps `push` cheap.
+
